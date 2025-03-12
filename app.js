@@ -4,6 +4,7 @@ const path = require('path');
 const db = require('./database');
 
 const app = express();
+exports.app = app;
 const port = 3000;
 
 // ダッシュボードルートをインポート
@@ -107,21 +108,6 @@ app.get('/machines/cheap', (req, res) => {
   // cheap_machines.ejsに遷移するように変更。
   // ヒント: res.render('ファイル名', { 変数: DBから取得した値 })
   res.redirect('/');
-});
-
-// 課題2: 機械名で検索する
-app.get('/search', (req, res) => {
-  const keyword = req.query.keyword || '';
-
-  if (keyword === '') {
-    return res.render('search', { machines: [], keyword: '' }); // 検索ワードなしの場合の処理
-  }
-
-  // データベースから検索ワードに合致する機械情報を取得する処理をここに追加
-
-  // cheap_machines.ejsに遷移するように変更。
-  // ヒント: res.render('ファイル名', { keyword: DBから取得した値, machines: DBから取得した値 })
-  res.redirect('/');//
 });
 
 // 課題3: 「いいね」ボタンの処理
