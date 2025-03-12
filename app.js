@@ -102,11 +102,11 @@ app.get('/confirmation/:id', (req, res) => {
 
 // 課題1: 機械を料金の安い順に表示
 app.get('/machines/cheap', (req, res) => {
-  // データベースから料金の安い順に機械の情報を取得する処理をここに追加
-
-  // cheap_machines.ejsに遷移するように変更。
-  // ヒント: res.render('ファイル名', { 変数: DBから取得した値 })
-  res.redirect('/');
+    db.all(
+      'SELECT * FROM machines ORDER BY daily_fee ASC',
+      (error, results) => {
+        res.render('cheap_machines.ejs', {machines: results});
+      });
 });
 
 // 課題2: 機械名で検索する
@@ -124,9 +124,10 @@ app.get('/search', (req, res) => {
   res.redirect('/');
 });
 
-// 課題3: 「いいね」ボタンの処理
+ //課題３：「いいね」ボタンの処理
 app.post('/machines/:id/like', (req, res) => {
   const machineId = req.params.id;
+
 
   // いいね数を増やす処理をここに追加
   db.run(
@@ -138,9 +139,9 @@ app.post('/machines/:id/like', (req, res) => {
       return res.status(500).send('データベースエラー');
       }
      res.redirect('/')
-  }
-  );
- });
+}
+);
+});
 
 // 課題4: 人気順（いいねの多い順）に機械を表示(front・backend)
 app.get('/machines/popular', (req, res) => {
