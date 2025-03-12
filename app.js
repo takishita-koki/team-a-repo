@@ -103,11 +103,11 @@ app.get('/confirmation/:id', (req, res) => {
 
 // 課題1: 機械を料金の安い順に表示
 app.get('/machines/cheap', (req, res) => {
-  // データベースから料金の安い順に機械の情報を取得する処理をここに追加
-
-  // cheap_machines.ejsに遷移するように変更。
-  // ヒント: res.render('ファイル名', { 変数: DBから取得した値 })
-  res.redirect('/');
+    db.all(
+      'SELECT * FROM machines ORDER BY daily_fee ASC',
+      (error, results) => {
+        res.render('cheap_machines.ejs', {machines: results});
+      });
 });
 
 // 課題2: 機械名で検索する
@@ -131,33 +131,42 @@ app.get('/search', (req, res) => {
       res.render('search', { machines, keyword });
     }
   );
-});
+  
 // 課題3: 「いいね」ボタンの処理
 app.post('/machines/:id/like', (req, res) => {
   const machineId = req.params.id;
-  const referer = req.headers.referer || '/';
 
-  if (req.headers.referer) {
-    try {
-      const url = new URL(req.headers.referer);
-      redirectPath = url.pathname;
-    } catch (e) {
-      console.error('URL解析エラー:', e);
-    }
-  }
 
   // いいね数を増やす処理をここに追加
-
-  res.redirect(redirectPath);
+  db.run(
+    'UPDATE machines SET likes = likes + 1 WHERE id = ?',
+    [machineId],
+    (err) => {
+      if(err){
+      console.error('カラム追加エラー',err.message); //エラーメッセージを出力
+      return res.status(500).send('データベースエラー');
+      }
+     res.redirect('/')
+}
+);
 });
 
 // 課題4: 人気順（いいねの多い順）に機械を表示(front・backend)
 app.get('/machines/popular', (req, res) => {
   // データベースからいいねの多い順に機械の情報を取得する処理をここに追加
+db.all(
+  'SELECT * FROM machines ORDER BY likes DESC',
+  (err,machines) => {
+   if(err){
+    console.error('取得エラー:',err.message);
+    return res.status(500).send('データベースエラー');
+   }
 
   // 取得したデータをpopular_machines.ejsに渡す
   // ヒント: res.render('ファイル名', {machines: データベースから取得した値})
-  res.redirect('/');
+  res.render('popular_machines',{ machines : machines });
+}
+);
 });
 
 app.post('/rental/:id', (req, res) => {
