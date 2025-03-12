@@ -4,6 +4,7 @@ const path = require('path');
 const db = require('./database');
 
 const app = express();
+exports.app = app;
 const port = 3000;
 
 // ダッシュボードルートをインポート
@@ -112,19 +113,26 @@ app.get('/machines/cheap', (req, res) => {
 // 課題2: 機械名で検索する
 app.get('/search', (req, res) => {
   const keyword = req.query.keyword || '';
+  console.log(keyword);
 
   if (keyword === '') {
-    return res.render('search', { machines: [], keyword: '' }); // 検索ワードなしの場合の処理
+    return res.render('search', { machines: [], keyword: '' });
   }
 
-  // データベースから検索ワードに合致する機械情報を取得する処理をここに追加
-
-  // cheap_machines.ejsに遷移するように変更。
-  // ヒント: res.render('ファイル名', { keyword: DBから取得した値, machines: DBから取得した値 })
-  res.redirect('/');
-});
-
- //課題３：「いいね」ボタンの処理
+  db.all(
+    'SELECT * FROM machines WHERE name LIKE ?',
+    [`%${keyword}%`],
+    // 下記のような形でもできます。
+    // ['%' + keyword + '%'],
+    (err, machines) => {
+      if (err) {
+        return res.status(500).send('エラーが発生しました');
+      }
+      res.render('search', { machines, keyword });
+    }
+  );
+  
+// 課題3: 「いいね」ボタンの処理
 app.post('/machines/:id/like', (req, res) => {
   const machineId = req.params.id;
 
