@@ -128,7 +128,8 @@ app.get('/search', (req, res) => {
 app.post('/machines/:id/like', (req, res) => {
   const machineId = req.params.id;
 
-  // いいね数を増やす処理をここに追加　
+
+  // いいね数を増やす処理をここに追加
   db.run(
     'UPDATE machines SET likes = likes + 1 WHERE id = ?',
     [machineId],
@@ -145,10 +146,19 @@ app.post('/machines/:id/like', (req, res) => {
 // 課題4: 人気順（いいねの多い順）に機械を表示(front・backend)
 app.get('/machines/popular', (req, res) => {
   // データベースからいいねの多い順に機械の情報を取得する処理をここに追加
+db.all(
+  'SELECT * FROM machines ORDER BY likes DESC',
+  (err,machines) => {
+   if(err){
+    console.error('取得エラー:',err.message);
+    return res.status(500).send('データベースエラー');
+   }
 
   // 取得したデータをpopular_machines.ejsに渡す
   // ヒント: res.render('ファイル名', {machines: データベースから取得した値})
-  res.redirect('/');
+  res.render('popular_machines',{ machines : machines });
+}
+);
 });
 
 app.post('/rental/:id', (req, res) => {
