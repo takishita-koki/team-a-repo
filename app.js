@@ -121,7 +121,7 @@ app.get('/search', (req, res) => {
 
   // cheap_machines.ejsに遷移するように変更。
   // ヒント: res.render('ファイル名', { keyword: DBから取得した値, machines: DBから取得した値 })
-  res.redirect('/');
+  res.redirect('/');//
 });
 
 // 課題3: 「いいね」ボタンの処理
